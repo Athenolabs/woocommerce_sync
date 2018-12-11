@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include woocommerce_sync *.css
+recursive-include woocommerce_sync *.csv
+recursive-include woocommerce_sync *.html
+recursive-include woocommerce_sync *.ico
+recursive-include woocommerce_sync *.js
+recursive-include woocommerce_sync *.json
+recursive-include woocommerce_sync *.md
+recursive-include woocommerce_sync *.png
+recursive-include woocommerce_sync *.py
+recursive-include woocommerce_sync *.svg
+recursive-include woocommerce_sync *.txt
+recursive-exclude woocommerce_sync *.pyc
