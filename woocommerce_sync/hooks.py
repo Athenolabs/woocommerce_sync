@@ -107,7 +107,14 @@ app_license = "MIT"
 # 		"woocommerce_sync.tasks.monthly"
 # 	]
 # }
-
+scheduler_events = {
+	"hourly": [
+		"woocommerce_sync.api.sync_woocommerce"
+	],
+	# "daily": [
+	# 	"woocommerce_sync.billing.send_payment_notification_to_user"
+	# ]
+}
 # Testing
 # -------
 
