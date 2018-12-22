@@ -33,22 +33,22 @@ def is_shopify_enabled():
 	
 	return True
 	
-def make_shopify_log(title="Sync Log", status="Queued", method="sync_shopify", message=None, exception=False, 
+def make_woocommerce_log(title="Sync Log", status="Queued", method="sync_woocommerce", message=None, exception=False, 
 name=None, request_data={}):
 	if not name:
-		name = frappe.db.get_value("Shopify Log", {"status": "Queued"})
+		name = frappe.db.get_value("Woocommerce Log", {"status": "Queued"})
 		
 		if name:
 			""" if name not provided by log calling method then fetch existing queued state log"""
-			log = frappe.get_doc("Shopify Log", name)
+			log = frappe.get_doc("Woocommerce Log", name)
 		
 		else:
 			""" if queued job is not found create a new one."""
-			log = frappe.get_doc({"doctype":"Shopify Log"}).insert(ignore_permissions=True)
+			log = frappe.get_doc({"doctype":"Woocommerce Log"}).insert(ignore_permissions=True)
 		
 		if exception:
 			frappe.db.rollback()
-			log = frappe.get_doc({"doctype":"Shopify Log"}).insert(ignore_permissions=True)
+			log = frappe.get_doc({"doctype":"Woocommerce Log"}).insert(ignore_permissions=True)
 			
 		log.message = message if message else frappe.get_traceback()
 		log.title = title[0:140]
