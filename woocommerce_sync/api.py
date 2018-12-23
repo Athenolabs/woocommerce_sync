@@ -1,7 +1,14 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
+# from .exceptions import ShopifyError
+# from .sync_orders import sync_orders
+# from .sync_customers import sync_customers
+# from .sync_products import sync_products, update_item_stock_qty
+# from .sync_brand import sync_brand,add_items_to_collection
+from .utils import disable_shopify_sync_on_exception, make_woocommerce_log
 from frappe.utils.background_jobs import enqueue
+
 
 @frappe.whitelist()
 def sync_woocommerce():
@@ -14,7 +21,7 @@ def sync_woocommerce():
 def sync_woocommerce_resources():
 	woocommerce_settings = frappe.get_doc("Woocommerce Sync Settings")
 
-	make_shopify_log(title="Sync Job Queued", status="Queued", method=frappe.local.form_dict.cmd, message="Sync Job Queued")
+	make_woocommerce_log(title="Sync Job Queued", status="Queued", method=frappe.local.form_dict.cmd, message="Sync Job Queued")
 	
 	if shopify_settings.enable_shopify:
 		try :
