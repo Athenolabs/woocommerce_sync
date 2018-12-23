@@ -1,12 +1,12 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-# from .exceptions import ShopifyError
+from .exceptions import WoocommerceError
 # from .sync_orders import sync_orders
 # from .sync_customers import sync_customers
-# from .sync_products import sync_products, update_item_stock_qty
+from .sync_products import sync_products, update_item_stock_qty
 # from .sync_brand import sync_brand,add_items_to_collection
-from .utils import disable_shopify_sync_on_exception, make_woocommerce_log
+from .utils import disable_woocommerce_sync_on_exception, make_woocommerce_log
 from frappe.utils.background_jobs import enqueue
 
 
@@ -23,64 +23,64 @@ def sync_woocommerce_resources():
 
 	make_woocommerce_log(title="Sync Job Queued", status="Queued", method=frappe.local.form_dict.cmd, message="Sync Job Queued")
 	
-	if shopify_settings.enable_shopify:
+	if woocommerce_settings.enable_woocommerce:
 		try :
 			now_time = frappe.utils.now()
-			validate_shopify_settings(shopify_settings)
+			validate_woocommerce_settings(woocommerce_settings)
 			frappe.local.form_dict.count_dict = {}
-			sync_brand()
-			sync_products(shopify_settings.price_list, shopify_settings.warehouse)
-			sync_customers()
-			sync_orders()
-			update_item_stock_qty()
-			add_items_to_collection()
+			# sync_brand()
+			sync_products(woocommerce_settings.price_list, woocommerce_settings.warehouse)
+			# sync_customers()
+			# sync_orders()
+			# update_item_stock_qty()
+			# add_items_to_collection()
 			
-			frappe.db.set_value("Shopify Settings", None, "last_sync_datetime", now_time)
+			frappe.db.set_value("Woocommerce Settings", None, "last_sync_datetime", now_time)
 			
-			make_shopify_log(title="Sync Completed", status="Success", method=frappe.local.form_dict.cmd, 
+			make_woocommerce_log(title="Sync Completed", status="Success", method=frappe.local.form_dict.cmd, 
 				message= "Updated {customers} customer(s), {products} item(s), {orders} order(s)".format(**frappe.local.form_dict.count_dict))
 
 		except Exception as e:
 			if e.args[0] and hasattr(e.args[0], "startswith") and e.args[0].startswith("402"):
-				make_shopify_log(title="Shopify has suspended your account", status="Error",
-					method="sync_shopify_resources", message=_("""Shopify has suspended your account till
-					you complete the payment. We have disabled ERPNext Shopify Sync. Please enable it once
-					your complete the payment at Shopify."""), exception=True)
+				make_woocommerce_log(title="woocommerce has suspended your account", status="Error",
+					method="sync_woocommerce_resources", message=_("""woocommerce has suspended your account till
+					you complete the payment. We have disabled ERPNext woocommerce Sync. Please enable it once
+					your complete the payment at woocommerce."""), exception=True)
 
-				disable_shopify_sync_on_exception()
+				disable_woocommerce_sync_on_exception()
 			
 			else:
-				make_shopify_log(title="sync has terminated", status="Error", method="sync_shopify_resources",
+				make_woocommerce_log(title="sync has terminated", status="Error", method="sync_woocommerce_resources",
 					message=frappe.get_traceback(), exception=True)
 					
-	elif frappe.local.form_dict.cmd == "erpnext_shopify.api.sync_shopify":
-		make_shopify_log(
-			title="Shopify connector is disabled",
+	elif frappe.local.form_dict.cmd == "erpnext_woocommerce.api.sync_woocommerce":
+		make_woocommerce_log(
+			title="woocommerce connector is disabled",
 			status="Error",
-			method="sync_shopify_resources",
-			message=_("""Shopify connector is not enabled. Click on 'Connect to Shopify' to connect ERPNext and your Shopify store."""),
+			method="sync_woocommerce_resources",
+			message=_("""woocommerce connector is not enabled. Click on 'Connect to woocommerce' to connect ERPNext and your woocommerce store."""),
 			exception=True)
 
-def validate_shopify_settings(shopify_settings):
+def validate_woocommerce_settings(woocommerce_settings):
 	"""
 		This will validate mandatory fields and access token or app credentials 
-		by calling validate() of shopify settings.
+		by calling validate() of woocommerce settings.
 	"""
 	try:
-		shopify_settings.save()
-	except ShopifyError:
-		disable_shopify_sync_on_exception()
+		woocommerce_settings.save()
+	except WoocommerceError:
+		disable_woocommerce_sync_on_exception()
 
 @frappe.whitelist()
 def get_log_status():
-	log = frappe.db.sql("""select name, status from `tabShopify Log` 
+	log = frappe.db.sql("""select name, status from `tabWoocommerce Log` 
 		order by modified desc limit 1""", as_dict=1)
 	if log:
 		if log[0].status=="Queued":
 			message = _("Last sync request is queued")
 			alert_class = "alert-warning"
 		elif log[0].status=="Error":
-			message = _("Last sync request was failed, check <a href='../desk#Form/Shopify Log/{0}'> here</a>"
+			message = _("Last sync request was failed, check <a href='../desk#Form/Woocommerce Log/{0}'> here</a>"
 				.format(log[0].name))
 			alert_class = "alert-danger"
 		else:

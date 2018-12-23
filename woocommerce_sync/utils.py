@@ -5,30 +5,30 @@
 from __future__ import unicode_literals
 import frappe
 import json
-from .exceptions import ShopifySetupError
+from .exceptions import WoocommerceError
 
-def disable_shopify_sync_for_item(item, rollback=False):
+def disable_woocommerce_sync_for_item(item, rollback=False):
 	"""Disable Item if not exist on shopify"""
 	if rollback:
 		frappe.db.rollback()
 		
-	item.sync_with_shopify = 0
-	item.sync_qty_with_shopify = 0
+	item.sync_with_woocommerce = 0
+	item.sync_qty_with_woocommerce = 0
 	item.save(ignore_permissions=True)
 	frappe.db.commit()
 
 def disable_shopify_sync_on_exception():
 	frappe.db.rollback()
-	frappe.db.set_value("Shopify Settings", None, "enable_shopify", 0)
+	frappe.db.set_value("Woocommerce Settings", None, "enable_woocommerce", 0)
 	frappe.db.commit()
 
-def is_shopify_enabled():
-	shopify_settings = frappe.get_doc("Shopify Settings")
-	if not shopify_settings.enable_shopify:
+def is_woocommerce_enabled():
+	woocommerce_settings = frappe.get_doc("Woocommerce Settings")
+	if not woocommerce_settings.enable_woocommerce:
 		return False
 	try:
-		shopify_settings.validate()
-	except ShopifySetupError:
+		woocommerce_settings.validate()
+	except WoocommerceError:
 		return False
 	
 	return True
