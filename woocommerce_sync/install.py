@@ -1,30 +1,34 @@
 from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+from frappe import _
 
 def after_install():
 	create_custom_field('Item', {
-		'label': _('Sync Quantity With Shopify'),
-		'fieldname': 'sync_qty_with_woocommerce',
+		'label': _('Sync Quantity With Woocommerce Sync'),
+		'fieldname': 'sync_qty_with_woocommerce_sync',
 		'fieldtype': 'Check',
 		'insert_after': 'item_code'
 	})
 	create_custom_field('Item', {
-		'label': _('Fetch Customer from Sales Inquiry'),
-		'fieldname': 'fetch_customer_frm_si',
-		'fieldtype': 'Button',
-		'depends_on':'eval:doc.contact_no_car_sales',
-		'insert_after': 'contact_no_car_sales'
+		'label': _('Sync Variant Id'),
+		'fieldname': 'woocommerce_sync_variant_id',
+		'fieldtype': 'Data',
+		'insert_after': 'sync_qty_with_woocommerce_sync'
 	})
 	create_custom_field('Item', {
-		'label': _('Sales Inquiry'),
-		'fieldname': 'sales_inquiry',
-		'fieldtype': 'Link',
-		'options': 'Sales Inquiry',
-		'insert_after': 'customer'
+		'label': _('Woocommerce Sync Product Id'),
+		'fieldname': 'woocommerce_sync_product_id',
+		'fieldtype': 'Data',
+		'insert_after': 'woocommerce_sync_variant_id'
 	})
 	create_custom_field('Item', {
-		'label': _('Fetch Customer from Sales Inquiry'),
-		'fieldname': 'fetch_customer_frm_si',
-		'fieldtype': 'Button',
-		'depends_on':'eval:doc.sales_inquiry',
-		'insert_after': 'sales_inquiry'
+		'label': _('Sync With Woocommerce Sync'),
+		'fieldname': 'sync_with_woocommerce_sync',
+		'fieldtype': 'Check',
+		'insert_after': 'is_stock_item'
+	})
+	create_custom_field('Item', {
+		'label': _('Woocommerce Sync Description'),
+		'fieldname': 'woocommerce_sync_description',
+		'fieldtype': 'Check',
+		'insert_after': 'brand'
 	})

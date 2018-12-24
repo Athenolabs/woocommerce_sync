@@ -14,22 +14,18 @@ class WoocommerceSyncSettings(Document):
 	def validate(self):
 		if self.enable_woocommerce == 1:
 			self.validate_access_credentials()
-			self.validate_access()
+			# self.validate_access()
 
 	def validate_access_credentials(self):
-		if self.app_type == "Private":
-			if not (self.get_password(raise_exception=False) and self.api_key and self.woocommerce_url):
-				frappe.msgprint(_("Missing value for Password, API Key or woocommerce URL"), raise_exception=WoocommerceSetupError)
-
-		else:
-			if not (self.access_token and self.woocommerce_url):
-				frappe.msgprint(_("Access token or woocommerce URL missing"), raise_exception=WoocommerceSetupError)
+		if not (self.access_token and self.woocommerce_url):
+			pass
+			# frappe.msgprint(_("Access token or woocommerce URL missing"), raise_exception=WoocommerceSetupError)
 
 	def validate_access(self):
 		try:
 			get_request('/admin/products.json', {"api_key": self.api_key,
 				"password": self.get_password(raise_exception=False), "woocommerce_url": self.woocommerce_url,
-				"access_token": self.access_token, "app_type": self.app_type})
+				"access_token": self.access_token})
 
 		except requests.exceptions.HTTPError:
 			# disable woocommerce!

@@ -17,7 +17,7 @@ def disable_woocommerce_sync_for_item(item, rollback=False):
 	item.save(ignore_permissions=True)
 	frappe.db.commit()
 
-def disable_shopify_sync_on_exception():
+def disable_woocommerce_sync_on_exception():
 	frappe.db.rollback()
 	frappe.db.set_value("Woocommerce Settings", None, "enable_woocommerce", 0)
 	frappe.db.commit()

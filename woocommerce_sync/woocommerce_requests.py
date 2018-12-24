@@ -63,19 +63,20 @@ def delete_request(path):
 	r.raise_for_status()
 
 def get_woocommerce_url(path, settings):
-	if settings['app_type'] == "Private":
-		return 'https://{}:{}@{}/{}'.format(settings['api_key'], settings['password'], settings['woocommerce_url'], path)
-	else:
-		return 'https://{}/{}'.format(settings['woocommerce_url'], path)
+	# if settings['app_type'] == "Private":
+	# 	return 'https://{}:{}@{}/{}'.format(settings['api_key'], settings['password'], settings['woocommerce_url'], path)
+	# else:
+	# 	return 'https://{}/{}'.format(settings['woocommerce_url'], path)
+	return 'https://{}/{}'.format(settings['woocommerce_url'], path)
 
 def get_header(settings):
 	header = {'Content-Type': 'application/json'}
 
-	if settings['app_type'] == "Private":
-		return header
-	else:
-		header["X-woocommerce-Access-Token"] = settings['access_token']
-		return header
+	# if settings['app_type'] == "Private":
+	# 	return header
+	# else:
+	# 	header["X-woocommerce-Access-Token"] = settings['access_token']
+	return header
 
 def get_filtering_condition():
 	woocommerce_settings = get_woocommerce_settings()

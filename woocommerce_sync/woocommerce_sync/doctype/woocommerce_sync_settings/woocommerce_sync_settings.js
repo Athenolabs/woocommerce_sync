@@ -54,8 +54,8 @@ frappe.ui.form.on("Woocommerce Sync Settings", "refresh", function(frm){
 			}).addClass("btn-primary")
 	}
 
-	frm.add_custom_button(__("woocommerce Log"), function(){
-		frappe.set_route("List", "woocommerce Log");
+	frm.add_custom_button(__("Woocommerce Log"), function(){
+		frappe.set_route("List", "Woocommerce Log");
 	})
 	
 	frm.add_custom_button(__("Reset Last Sync Date"), function(){

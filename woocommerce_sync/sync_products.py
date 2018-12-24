@@ -338,6 +338,9 @@ def update_item(item_details, item_dict):
 
 def sync_erpnext_items(price_list, warehouse, woocommerce_item_list):
 	for item in get_erpnext_items(price_list):
+		print("Item IN ERPNext")
+		print(item.name)
+		continue
 		if item.woocommerce_product_id not in woocommerce_item_list:
 			try:
 				sync_item_with_woocommerce(item, price_list, warehouse)
