@@ -37,8 +37,10 @@ def sync_woocommerce_resources():
 			
 			frappe.db.set_value("Woocommerce Settings", None, "last_sync_datetime", now_time)
 			
+			# make_woocommerce_log(title="Sync Completed", status="Success", method=frappe.local.form_dict.cmd, 
+			# 	message= "Updated {customers} customer(s), {products} item(s), {orders} order(s)".format(**frappe.local.form_dict.count_dict))
 			make_woocommerce_log(title="Sync Completed", status="Success", method=frappe.local.form_dict.cmd, 
-				message= "Updated {customers} customer(s), {products} item(s), {orders} order(s)".format(**frappe.local.form_dict.count_dict))
+				message= "Updated customer(s), item(s), order(s)")
 
 		except Exception as e:
 			if e.args[0] and hasattr(e.args[0], "startswith") and e.args[0].startswith("402"):

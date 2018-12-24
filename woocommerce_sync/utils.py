@@ -19,11 +19,11 @@ def disable_woocommerce_sync_for_item(item, rollback=False):
 
 def disable_woocommerce_sync_on_exception():
 	frappe.db.rollback()
-	frappe.db.set_value("Woocommerce Settings", None, "enable_woocommerce", 0)
+	frappe.db.set_value("Woocommerce Sync Settings", None, "enable_woocommerce", 0)
 	frappe.db.commit()
 
 def is_woocommerce_enabled():
-	woocommerce_settings = frappe.get_doc("Woocommerce Settings")
+	woocommerce_settings = frappe.get_doc("Woocommerce Sync Settings")
 	if not woocommerce_settings.enable_woocommerce:
 		return False
 	try:

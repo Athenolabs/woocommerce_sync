@@ -32,3 +32,10 @@ def after_install():
 		'fieldtype': 'Check',
 		'insert_after': 'brand'
 	})
+	create_custom_field('Item', {
+		'label': _('Default Supplier'),
+		'fieldname': 'default_supplier_woocommerce_sync',
+		'fieldtype': 'Link',
+		'options': 'Supplier',
+		'insert_after': 'manufacturer_part_no'
+	})
