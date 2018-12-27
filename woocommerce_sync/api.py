@@ -29,7 +29,7 @@ def sync_woocommerce_resources():
 			validate_woocommerce_settings(woocommerce_settings)
 			frappe.local.form_dict.count_dict = {}
 			# sync_brand()
-			sync_products(woocommerce_settings.price_list, woocommerce_settings.warehouse)
+			sync_products(woocommerce_settings.price_list, woocommerce_settings.woocommerce_warehouse)
 			# sync_customers()
 			# sync_orders()
 			# update_item_stock_qty()

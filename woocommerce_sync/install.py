@@ -29,7 +29,7 @@ def after_install():
 	create_custom_field('Item', {
 		'label': _('Woocommerce Sync Description'),
 		'fieldname': 'woocommerce_sync_description',
-		'fieldtype': 'Check',
+		'fieldtype': 'Text Editor',
 		'insert_after': 'brand'
 	})
 	create_custom_field('Item', {

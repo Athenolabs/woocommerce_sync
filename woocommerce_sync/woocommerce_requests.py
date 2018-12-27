@@ -4,6 +4,7 @@ from frappe import _
 import json, math, time, pytz
 from .exceptions import WoocommerceError
 from frappe.utils import get_request_session, get_datetime, get_time_zone
+from woocommerce import API
 
 def check_api_call_limit(response):
 	"""
@@ -17,50 +18,80 @@ def check_api_call_limit(response):
 		time.sleep(10)    # pause 10 seconds
 
 def get_woocommerce_settings():
-	d = frappe.get_doc("Woocommerce Settings")
+	d = frappe.get_doc("Woocommerce Sync Settings")
 	
 	if d.woocommerce_url:
-		if d.app_type == "Private" and d.password:
-			d.password = d.get_password()
+		d.password = d.get_password(fieldname='password')
 		return d.as_dict()
+	
 	else:
-		frappe.throw(_("Woocommerce store URL is not configured on Woocommerce Settings"), WoocommerceError)
+		frappe.throw(_("woocommerce store URL is not configured on woocommerce Settings"), WoocommerceError)
 
 def get_request(path, settings=None):
 	if not settings:
 		settings = get_woocommerce_settings()
 
-	s = get_request_session()
-	url = get_woocommerce_url(path, settings)
-	r = s.get(url, headers=get_header(settings))
-	check_api_call_limit(r)
+	wcapi = API(
+		url=settings['woocommerce_url'],
+		consumer_key=settings['api_key'],
+		consumer_secret=settings['password'],
+		# verify_ssl=settings['verify_ssl'],
+		wp_api=True,
+		version="wc/v3"
+	)
+	r = wcapi.get(path)
+	
 	r.raise_for_status()
 	return r.json()
 
-def post_request(path, data):
-	settings = get_woocommerce_settings()
-	s = get_request_session()
-	url = get_woocommerce_url(path, settings)
-	r = s.post(url, data=json.dumps(data), headers=get_header(settings))
-	check_api_call_limit(r)
+def post_request(path, data, settings=None):
+	if not settings:
+		settings = get_woocommerce_settings()
+	wcapi = API(
+		url=settings['woocommerce_url'],
+		consumer_key=settings['api_key'],
+		consumer_secret=settings['password'],
+		verify_ssl=True,
+		wp_api=True,
+		version="wc/v3",
+		queryStringAuth= True
+	)
+	r = wcapi.post(path, data)
+	
 	r.raise_for_status()
 	return r.json()
 
-def put_request(path, data):
-	settings = get_woocommerce_settings()
-	s = get_request_session()
-	url = get_woocommerce_url(path, settings)
-	r = s.put(url, data=json.dumps(data), headers=get_header(settings))
-	check_api_call_limit(r)
+def put_request(path, data, settings=None):
+	if not settings:
+		settings = get_woocommerce_settings()
+
+	wcapi = API(
+		url=settings['woocommerce_url'],
+		consumer_key=settings['api_key'],
+		consumer_secret=settings['password'],
+		wp_api=True,
+		version="wc/v3"
+	)
+	r = wcapi.put(path, data)
+	
 	r.raise_for_status()
 	return r.json()
 
-def delete_request(path):
-	s = get_request_session()
-	settings = get_woocommerce_settings()
-	url = get_woocommerce_url(path, settings)
-	r = s.delete(url)
+def delete_request(path, settings=None):
+	if not settings:
+		settings = get_woocommerce_settings()
+
+	wcapi = API(
+		url=settings['woocommerce_url'],
+		consumer_key=settings['api_key'],
+		consumer_secret=settings['password'],
+		wp_api=True,
+		version="wc/v3"
+	)
+	r = wcapi.delete(path)
+	
 	r.raise_for_status()
+	return r.json()
 
 def get_woocommerce_url(path, settings):
 	return '{}/{}'.format(settings['woocommerce_url'], path)
