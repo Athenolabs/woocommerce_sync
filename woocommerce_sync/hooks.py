@@ -56,7 +56,7 @@ app_license = "MIT"
 
 # before_install = "woocommerce_sync.install.before_install"
 # after_install = "woocommerce_sync.install.after_install"
-
+after_install = "woocommerce_sync.install.after_install"
 # Desk Notifications
 # ------------------
 # See frappe.core.notifications.get_notification_config
@@ -107,7 +107,14 @@ app_license = "MIT"
 # 		"woocommerce_sync.tasks.monthly"
 # 	]
 # }
-
+scheduler_events = {
+	"hourly": [
+		"woocommerce_sync.api.sync_woocommerce"
+	],
+	# "daily": [
+	# 	"woocommerce_sync.billing.send_payment_notification_to_user"
+	# ]
+}
 # Testing
 # -------
 
