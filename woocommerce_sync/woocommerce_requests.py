@@ -56,7 +56,11 @@ def post_request(path, data, settings=None):
 		version="wc/v3",
 		queryStringAuth= True
 	)
-	r = wcapi.post(path, data)
+	try:
+		r = wcapi.post(path, data)
+	except requests.exceptions.HTTPError, e:
+		make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_items", message=frappe.get_traceback(),
+				request_data=item, exception=True)
 	print(r.json())
 	r.raise_for_status()
 	return r.json()
