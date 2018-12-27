@@ -57,21 +57,12 @@ def post_request(path, data, settings=None):
 		version="wc/v3",
 		queryStringAuth= True
 	)
-	print(
-		{"url":settings['woocommerce_url'],
-		"consumer_key":settings['api_key'],
-		"consumer_secret":settings['password']}
-	)
-	print(path)
-	print(data)
 	try:
 		r = wcapi.post(path, data)
 		r.raise_for_status()
-		print(r.json())
 	except requests.exceptions.HTTPError, e:
 		make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_items", message=frappe.get_traceback(),
 				request_data=item, exception=True)
-
 	return r.json()
 
 def put_request(path, data, settings=None):
