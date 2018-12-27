@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-import json, math, time, pytz
+import json, math, time, pytz, requests
 from .exceptions import WoocommerceError
 from frappe.utils import get_request_session, get_datetime, get_time_zone
 from woocommerce import API
+
 
 def check_api_call_limit(response):
 	"""
