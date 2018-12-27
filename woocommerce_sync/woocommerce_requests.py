@@ -57,7 +57,7 @@ def post_request(path, data, settings=None):
 		queryStringAuth= True
 	)
 	r = wcapi.post(path, data)
-	
+	print(r.json())
 	r.raise_for_status()
 	return r.json()
 
