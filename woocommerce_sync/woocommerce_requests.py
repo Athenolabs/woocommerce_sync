@@ -57,6 +57,17 @@ def post_request(path, data, settings=None):
 		version="wc/v3",
 		queryStringAuth= True
 	)
+	print(
+		url=settings['woocommerce_url'],
+		consumer_key=settings['api_key'],
+		consumer_secret=settings['password'],
+		verify_ssl=True,
+		wp_api=True,
+		version="wc/v3",
+		queryStringAuth= True
+	)
+	print(path)
+	print(data)
 	try:
 		r = wcapi.post(path, data)
 		r.raise_for_status()
