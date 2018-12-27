@@ -58,13 +58,9 @@ def post_request(path, data, settings=None):
 		queryStringAuth= True
 	)
 	print(
-		(url=settings['woocommerce_url'],
-		consumer_key=settings['api_key'],
-		consumer_secret=settings['password'],
-		verify_ssl=True,
-		wp_api=True,
-		version="wc/v3",
-		queryStringAuth= True)
+		{"url":settings['woocommerce_url'],
+		"consumer_key":settings['api_key'],
+		"consumer_secret":settings['password']}
 	)
 	print(path)
 	print(data)
