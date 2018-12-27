@@ -5,6 +5,7 @@ import json, math, time, pytz, requests
 from .exceptions import WoocommerceError
 from frappe.utils import get_request_session, get_datetime, get_time_zone
 from woocommerce import API
+from .utils import make_woocommerce_log
 
 
 def check_api_call_limit(response):
@@ -61,8 +62,8 @@ def post_request(path, data, settings=None):
 		r = wcapi.post(path, data)
 		r.raise_for_status()
 	except requests.exceptions.HTTPError, e:
-		make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_items", message=frappe.get_traceback(),
-				request_data=item, exception=True)
+		make_woocommerce_log(title=e.message, status="Error", method="post_request", message=frappe.get_traceback(),
+				request_data=data, exception=True)
 	return r.json()
 
 def put_request(path, data, settings=None):
