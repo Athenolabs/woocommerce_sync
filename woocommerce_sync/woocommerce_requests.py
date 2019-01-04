@@ -61,10 +61,10 @@ def post_request(path, data, settings=None):
 	try:
 		r = wcapi.post(path, data)
 		r.raise_for_status()
+		return r.json()
 	except requests.exceptions.HTTPError, e:
-		make_woocommerce_log(title=e.message, status="Error", method="post_request", message=frappe.get_traceback(),
+		make_woocommerce_log(title=e.message, status="Error", method="post_request", message=r.text,
 				request_data=data, exception=True)
-	return r.json()
 
 def put_request(path, data, settings=None):
 	if not settings:

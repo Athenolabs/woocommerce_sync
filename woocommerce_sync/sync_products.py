@@ -387,6 +387,7 @@ def get_erpnext_items(price_list):
 
 def sync_item_with_woocommerce(item, price_list, warehouse):
 	variant_item_name_list = []
+	variant_list = []
 	item_data = {
 		"name": item.get("item_name"),
 		"description": item.get("woocommerce_sync_description") or item.get("web_long_description") or item.get("description"),
@@ -394,21 +395,22 @@ def sync_item_with_woocommerce(item, price_list, warehouse):
 		"manage_stock":item.get("sync_qty_with_woocommerce_sync"),
 		"images":[],
 	}
+	item_data.update( get_price_and_stock_details(item, warehouse, price_list) )
 	if item.get("has_variants") or item.get("variant_of"):
 		item_data["type"] = "variable"
 		if item.get("variant_of"):
 			item = frappe.get_doc("Item", item.get("variant_of"))
 
 		variant_list, options, variant_item_name = get_variant_attributes(item, price_list, warehouse)
-		item_data["options"] = options
+		item_data["attributes"] = options
 
 		variant_item_name_list.extend(variant_item_name)
 
 	else:
-		price_and_stock = []
-		price_and_stock = get_price_and_stock_details(item, warehouse, price_list)
-		item_data["stock_quantity"] = price_and_stock['inventory_quantity']
-		item_data["regular_price"] = str(price_and_stock['price'])
+		# price_and_stock = []
+		# price_and_stock = get_price_and_stock_details(item, warehouse, price_list)
+		# item_data["stock_quantity"] = price_and_stock['inventory_quantity']
+		# item_data["regular_price"] = str(price_and_stock['regular_price'])
 		item_data["type"] = "simple" 
 		
 	erp_item = frappe.get_doc("Item", item.get("name"))
@@ -527,27 +529,32 @@ def get_variant_attributes(item, price_list, warehouse):
 		fields=['name'])):
 
 		item_variant = frappe.get_doc("Item", variant.get("name"))
-		variant_list.append(get_price_and_stock_details(item_variant, warehouse, price_list))
-
+		data = (get_price_and_stock_details(item_variant, warehouse, price_list))
+		data["item_name"] = item_variant.name
+		data["attributes"] = []
 		for attr in item_variant.get('attributes'):
+			attribute_option = {}
+			attribute_option["name"] = attr.attribute
+			attribute_option["option"] = attr.attribute_value
+			data["attributes"].append(attribute_option)
+			
 			if attr.attribute not in attr_sequence:
 				attr_sequence.append(attr.attribute)
-
 			if not attr_dict.get(attr.attribute):
 				attr_dict.setdefault(attr.attribute, [])
 
 			attr_dict[attr.attribute].append(attr.attribute_value)
-
-			if attr.idx <= 3:
-				variant_list[i]["option"+cstr(attr.idx)] = attr.attribute_value
-
-		variant_item_name.append(item_variant.name)
+		
+		variant_list.append(data)	
+		
 
 	for i, attr in enumerate(attr_sequence):
 		options.append({
 			"name": attr,
+			"visible": "True",
+			"variation": "True",
 			"position": i+1,
-			"values": list(set(attr_dict[attr]))
+			"options": list(set(attr_dict[attr]))
 		})
 
 	return variant_list, options, variant_item_name
@@ -564,7 +571,7 @@ def get_price_and_stock_details(item, warehouse, price_list):
 			{"price_list": price_list, "item_code":item.get("item_code")}, "price_list_rate")
 
 	item_price_and_quantity = {
-		"price": flt(price)
+		"regular_price": str(price)
 	}
 	if item.weight_per_unit:
 		if item.weight_uom and item.weight_uom.lower() in ["kg", "g", "oz", "lb"]:
@@ -577,8 +584,8 @@ def get_price_and_stock_details(item, warehouse, price_list):
 
 	if item.get("sync_qty_with_woocommerce_sync"):
 		item_price_and_quantity.update({
-			"inventory_quantity": cint(qty) if qty else 0,
-			"inventory_management": "woocommerce"
+			"stock_quantity": cint(qty) if qty else 0,
+			"manage_stock": "True"
 		})
 
 	if item.woocommerce_sync_variant_id:
