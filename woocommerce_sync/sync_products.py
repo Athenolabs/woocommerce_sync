@@ -396,7 +396,12 @@ def sync_item_with_woocommerce(item, price_list, warehouse):
 		"images":[],
 	}
 	item_data.update( get_price_and_stock_details(item, warehouse, price_list) )
-	if item.get("has_variants") or item.get("variant_of"):
+	if item.get("variant_of"):
+		parent_item_sync = frappe.get_doc("Item", item.get("variant_of"))
+		if not parent_item_sync.get("woocommerce_sync_product_id"):
+			return
+		create_or_update_varient_to_woocommerce()
+	elif item.get("has_variants"):
 		item_data["type"] = "variable"
 		if item.get("variant_of"):
 			item = frappe.get_doc("Item", item.get("variant_of"))
@@ -415,7 +420,29 @@ def sync_item_with_woocommerce(item, price_list, warehouse):
 		
 	erp_item = frappe.get_doc("Item", item.get("name"))
 	erp_item.flags.ignore_mandatory = True
-	
+	if not item.get("woocommerce_sync_product_id"):
+		create_new_item_to_woocommerce(item, item_data, erp_item, variant_item_name_list)
+		sync_item_image(erp_item)
+
+	else:
+		item_data["id"] = item.get("woocommerce_sync_product_id")
+		try:
+			updated_item = put_request("products/{0}".format(item.get("woocommerce_sync_product_id")), item_data)
+			# sync_item_image(erp_item)
+		except requests.exceptions.HTTPError as e:
+			if e.args[0] and (e.args[0].startswith("404") or e.args[0].startswith("400") ):
+				if frappe.db.get_value("Woocommerce Sync Settings", "Woocommerce Sync Settings", "if_not_exists_create_item_to_woocommerce"):
+					item_data["id"] = ''
+					create_new_item_to_woocommerce(item, item_data, erp_item, variant_item_name_list)
+					# sync_item_image(erp_item)
+				else:
+					disable_woocommerce_sync_for_item(erp_item)
+			else:
+				raise e
+
+	frappe.db.commit()
+
+def create_or_update_varient_to_woocommerce():
 	if not item.get("woocommerce_sync_product_id"):
 		create_new_item_to_woocommerce(item, item_data, erp_item, variant_item_name_list)
 		sync_item_image(erp_item)
@@ -556,7 +583,6 @@ def get_variant_attributes(item, price_list, warehouse):
 			"position": i+1,
 			"options": list(set(attr_dict[attr]))
 		})
-
 	return variant_list, options, variant_item_name
 
 def get_price_and_stock_details(item, warehouse, price_list):
