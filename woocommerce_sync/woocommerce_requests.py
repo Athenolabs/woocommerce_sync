@@ -29,22 +29,25 @@ def get_woocommerce_settings():
 	else:
 		frappe.throw(_("woocommerce store URL is not configured on woocommerce Settings"), WoocommerceError)
 
-def get_request(path, settings=None):
-	if not settings:
-		settings = get_woocommerce_settings()
+def get_request_request(path, settings=None, debug = False):
+		if not settings:
+			settings = get_woocommerce_settings()
 
-	wcapi = API(
-		url=settings['woocommerce_url'],
-		consumer_key=settings['api_key'],
-		consumer_secret=settings['password'],
-		# verify_ssl=settings['verify_ssl'],
-		wp_api=True,
-		version="wc/v3"
-	)
-	r = wcapi.get(path)
+		wcapi = API(
+			url=settings['woocommerce_url'],
+			consumer_key=settings['api_key'],
+			consumer_secret=settings['password'],
+			# verify_ssl=settings['verify_ssl'],
+			wp_api=True,
+			version="wc/v3"
+		)
+		r = wcapi.get(path)
+		
+		r.raise_for_status()
+		return r
 	
-	r.raise_for_status()
-	return r.json()
+def get_request(path, settings=None):
+	return get_request_request(path, settings).json()
 
 def post_request(path, data, settings=None):
 	if not settings:
@@ -172,7 +175,10 @@ def get_woocommerce_customers(ignore_filter_conditions=False):
 	if not ignore_filter_conditions:
 		filter_condition = get_filtering_condition()
 
-	for page_idx in xrange(0, get_total_pages("customers/count.json?", ignore_filter_conditions) or 1):
-		woocommerce_customers.extend(get_request('/admin/customers.json?limit=250&page={0}&{1}'.format(page_idx+1,
-			filter_condition))['customers'])
+	response = get_request_request('customers?{0}'.format(filter_condition))
+	woocommerce_customers.extend(response.json())
+	
+	for page_idx in xrange(1, int( response.headers.get('X-WP-TotalPages')) or 1):
+		response = get_request_request('customers?page={0}&{1}'.format(page_idx+1,filter_condition))
+		woocommerce_customers.extend(response.json())
 	return woocommerce_customers

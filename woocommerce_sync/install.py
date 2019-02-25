@@ -1,6 +1,7 @@
 from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 from frappe import _
-
+import frappe
+@frappe.whitelist()
 def after_install():
 	create_custom_field('Item', {
 		'label': _('Sync Quantity With Woocommerce Sync'),
@@ -39,3 +40,10 @@ def after_install():
 		'options': 'Supplier',
 		'insert_after': 'manufacturer_part_no'
 	})
+	create_custom_field('Customer', {
+		'label': _('Woocommerce Customer ID'),
+		'fieldname': 'woocommerce_customer_id',
+		'fieldtype': 'Data',
+		'insert_after': 'customer_type'
+	})
+	

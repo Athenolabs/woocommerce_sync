@@ -45,6 +45,15 @@ frappe.ui.form.on("Woocommerce Sync Settings", "refresh", function(frm){
 				method:"woocommerce_sync.api.sync_woocommerce",
 			})
 		}).addClass("btn-primary");
+
+		frm.add_custom_button(__('Update Custome Field'), function() {
+			frappe.call({
+				method:"woocommerce_sync.install.after_install",
+				callback: function(r) {
+					frappe.msgprint(_("Updated"))
+				}
+			})
+		}).addClass("btn-primary");
 	}
 
 	if(!frm.doc.access_token && !frm.doc.api_key) {

@@ -9,7 +9,7 @@
  "custom": 0, 
  "docstatus": 0, 
  "doctype": "DocType", 
- "document_type": "System", 
+ "document_type": "Setup", 
  "editable_grid": 0, 
  "engine": "InnoDB", 
  "fields": [
@@ -186,7 +186,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2018-12-19 12:31:56.053460", 
+ "modified": "2019-02-25 10:42:26.272666", 
  "modified_by": "Administrator", 
  "module": "Woocommerce Sync", 
  "name": "Woocommerce Log", 

@@ -3,7 +3,7 @@ import frappe
 from frappe import _
 from .exceptions import WoocommerceError
 # from .sync_orders import sync_orders
-# from .sync_customers import sync_customers
+from .sync_customers import sync_customers
 from .sync_products import sync_products, update_item_stock_qty
 # from .sync_brand import sync_brand,add_items_to_collection
 from .utils import disable_woocommerce_sync_on_exception, make_woocommerce_log
@@ -29,8 +29,8 @@ def sync_woocommerce_resources():
 			validate_woocommerce_settings(woocommerce_settings)
 			frappe.local.form_dict.count_dict = {}
 			# sync_brand()
-			sync_products(woocommerce_settings.price_list, woocommerce_settings.woocommerce_warehouse)
-			# sync_customers()
+			# sync_products(woocommerce_settings.price_list, woocommerce_settings.woocommerce_warehouse)
+			sync_customers()
 			# sync_orders()
 			# update_item_stock_qty()
 			# add_items_to_collection()
