@@ -10,7 +10,7 @@ def sync_customers():
 	sync_woocommerce_customers(woocommerce_customer_list)
 	frappe.local.form_dict.count_dict["customers"] = len(woocommerce_customer_list)
 	
-	sync_erpnext_customers(woocommerce_customer_list)
+	# sync_erpnext_customers(woocommerce_customer_list)
 
 def sync_woocommerce_customers(woocommerce_customer_list):
 	for woocommerce_customer in get_woocommerce_customers():
@@ -64,29 +64,29 @@ def create_customer_address(customer, woocommerce_customer):
 	shipping_address = woocommerce_customer.get("shipping")
 	
 	if billing_address:
-                try :
-                        frappe.get_doc({
-                                "doctype": "Address",
-                                "woocommerce_address_id": "Billing",
-                                "address_title": customer.name,
-                                "address_type": "Billing",
-                                "address_line1": billing_address.get("address_1") or "Address 1",
-                                "address_line2": billing_address.get("address_2"),
-                                "city": billing_address.get("city") or "City",
-                                "state": billing_address.get("state"),
-                                "pincode": billing_address.get("postcode"),
-                                "country": billing_address.get("country"),
-                                "phone": billing_address.get("phone"),
-                                "email_id": billing_address.get("email"),
-                                "links": [{
-                                        "link_doctype": "Customer",
-                                        "link_name": customer.name
-                                }]
-                        }).insert()
+		try :
+			frappe.get_doc({
+					"doctype": "Address",
+					"woocommerce_address_id": "Billing",
+					"address_title": customer.name,
+					"address_type": "Billing",
+					"address_line1": billing_address.get("address_1") or "Address 1",
+					"address_line2": billing_address.get("address_2"),
+					"city": billing_address.get("city") or "City",
+					"state": billing_address.get("state"),
+					"pincode": billing_address.get("postcode"),
+					"country": frappe.db.get_value("Country", {"code":billing_address.get("country")}, "name"),
+					"phone": billing_address.get("phone"),
+					"email_id": billing_address.get("email"),
+					"links": [{
+							"link_doctype": "Customer",
+							"link_name": customer.name
+					}]
+			}).insert()
 
-                except Exception, e:
-                        make_woocommerce_log(title=e.message, status="Error", method="create_customer_address", message=frappe.get_traceback(),
-                                request_data=woocommerce_customer, exception=True)
+		except Exception, e:
+			make_woocommerce_log(title=e.message, status="Error", method="create_customer_address", message=frappe.get_traceback(),
+					request_data=woocommerce_customer, exception=True)
 
 
 		try :
@@ -100,7 +100,7 @@ def create_customer_address(customer, woocommerce_customer):
 				"city": shipping_address.get("city") or "City",
 				"state": shipping_address.get("province"),
 				"pincode": shipping_address.get("zip"),
-				"country": shipping_address.get("country"),
+				"country": 	frappe.db.get_value("Country", {"code":billing_address.get("country")}, "name"),
 				"phone": shipping_address.get("phone"),
 				"email_id": shipping_address.get("email"),
 				"links": [{

@@ -46,4 +46,16 @@ def after_install():
 		'fieldtype': 'Data',
 		'insert_after': 'customer_type'
 	})
+	create_custom_field('Customer', {
+		'label': _('Sync with Woocommerce'),
+		'fieldname': 'sync_with_woocommerce',
+		'fieldtype': 'Check',
+		'insert_after': 'woocommerce_customer_id'
+	})
+	create_custom_field('Sales Order', {
+		'label': _('Woocommerce Order ID'),
+		'fieldname': 'woocommerce_order_id',
+		'fieldtype': 'Data',
+		'insert_after': 'order_type'
+	})
 	
