@@ -466,6 +466,7 @@ def create_or_update_varient_to_woocommerce():
 	frappe.db.commit()
 
 def create_new_item_to_woocommerce(item, item_data, erp_item, variant_item_name_list):
+	print(item_data)
 	new_item = post_request("products", item_data)
 	erp_item.woocommerce_sync_product_id = new_item.get("id")
 	if not item.get("has_variants"):

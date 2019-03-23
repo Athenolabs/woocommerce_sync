@@ -84,8 +84,10 @@ def put_request(path, data, settings=None):
 		queryStringAuth= True
 	)
 	r = wcapi.put(path, data)
-	
-	r.raise_for_status()
+	try:
+		r.raise_for_status()
+	except Exception as e:
+		raise e
 	return r.json()
 
 def delete_request(path, settings=None):
