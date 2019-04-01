@@ -108,7 +108,7 @@ after_install = "woocommerce_sync.install.after_install"
 # 	]
 # }
 scheduler_events = {
-	"hourly": [
+	"all": [
 		"woocommerce_sync.api.sync_woocommerce"
 	],
 	# "daily": [
